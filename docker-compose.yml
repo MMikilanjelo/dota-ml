@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: dota2-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./ml_training/models:/app/models:ro
+      - ./data:/app/data:ro
+    networks:
+      - dota2-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: dota2-frontend
+    ports:
+      - "8501:8501"
+    environment:
+      - API_URL=http://backend:8000
+    depends_on:
+      - backend
+    networks:
+      - dota2-network
+
+networks:
+  dota2-network:
+    driver: bridge
